@@ -1,41 +1,88 @@
-# Prerequisites
-*.d
+# =========================
+# Node / Electron
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
 
-# Compiled Object files
-*.slo
-*.lo
+# Electron build folders
+dist/
+out/
+release/
+build/
+*.asar
+
+# =========================
+# C/C++ compiled files
+# =========================
+# Object files
 *.o
 *.obj
+*.lo
+*.slo
 
-# Precompiled Headers
+# Precompiled headers
 *.gch
 *.pch
 
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
+# Libraries
+*.lib
+*.a
+*.la
+*.lai
+*.dll
 *.so
 *.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
 
 # Executables
 *.exe
 *.out
 *.app
 
-# debug information files
+# Debug / temp files
+*.pdb
 *.dwo
+*.dSYM/
+*.log
+
+# =========================
+# CMake / build system
+# =========================
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+_build/
+*.ninja
+_build.ninja
+build.ninja
+
+# =========================
+# Node-gyp / cmake-js
+# =========================
+build/Release/
+*.node
+
+# =========================
+# VS / IDE specific
+# =========================
+.vscode/
+*.suo
+*.user
+*.vcxproj.user
+*.vcxproj.filters
+*.opensdf
+*.sdf
+*.ipch
+
+# =========================
+# Other temporary files
+# =========================
+*.swp
+*.tmp
+*.bak
+*.orig
