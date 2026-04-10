@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import ReactFlow, {
   Background,
   addEdge,
@@ -10,7 +10,6 @@ import ReactFlow, {
   Edge,
   NodeTypes,
   Panel,
-  useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useStudioStore } from "@/store/studio-store";
@@ -32,7 +31,7 @@ interface InnerCanvasProps {
   onAddNode: (node: Node) => void;
 }
 
-// Inner component to use useReactFlow hook
+// Inner component that handles the ReactFlow rendering
 function InnerCanvas({
   nodes,
   edges,
@@ -42,7 +41,8 @@ function InnerCanvas({
   onNodeClick,
   onAddNode,
 }: InnerCanvasProps) {
-  const { screenToFlowPosition } = useReactFlow();
+  const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
+  const [dragOffset] = useState({ x: 0, y: 0 });
 
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -56,10 +56,14 @@ function InnerCanvas({
       const nodeType = event.dataTransfer.getData("nodeType");
       if (!nodeType) return;
 
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
+      if (!reactFlowWrapperRef.current) return;
+
+      const bounds = reactFlowWrapperRef.current.getBoundingClientRect();
+
+      // Simple position calculation relative to the canvas wrapper
+      // This is a basic calculation without considering zoom/pan
+      const x = event.clientX - bounds.left - 50;
+      const y = event.clientY - bounds.top - 25;
 
       const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const isScope = nodeType === "scope";
@@ -68,7 +72,7 @@ function InnerCanvas({
       const newNode: Node = {
         id: nodeId,
         type: nodeTypeVal,
-        position,
+        position: { x: Math.max(0, x), y: Math.max(0, y) },
         data: {
           label: nodeType.charAt(0).toUpperCase() + nodeType.slice(1),
           ...(isScope && { dataX: [], dataY: [] }),
@@ -77,11 +81,12 @@ function InnerCanvas({
 
       onAddNode(newNode);
     },
-    [screenToFlowPosition, onAddNode]
+    [onAddNode]
   );
 
   return (
     <div
+      ref={reactFlowWrapperRef}
       className="w-full h-full"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
