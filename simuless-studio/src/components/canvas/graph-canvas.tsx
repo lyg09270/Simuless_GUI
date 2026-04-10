@@ -22,9 +22,90 @@ const nodeTypes: NodeTypes = {
   scope: ScopeNode,
 };
 
-function GraphCanvasContent() {
+interface InnerCanvasProps {
+  nodes: Node[];
+  edges: Edge[];
+  onNodesChange: (changes: any) => void;
+  onEdgesChange: (changes: any) => void;
+  onConnect: OnConnect;
+  onNodeClick: (e: React.MouseEvent, node: Node) => void;
+  onAddNode: (node: Node) => void;
+}
+
+// Inner component to use useReactFlow hook
+function InnerCanvas({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onNodeClick,
+  onAddNode,
+}: InnerCanvasProps) {
   const { screenToFlowPosition } = useReactFlow();
 
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const handleDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+
+      const nodeType = event.dataTransfer.getData("nodeType");
+      if (!nodeType) return;
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const isScope = nodeType === "scope";
+      const nodeTypeVal = isScope ? "scope" : "custom";
+
+      const newNode: Node = {
+        id: nodeId,
+        type: nodeTypeVal,
+        position,
+        data: {
+          label: nodeType.charAt(0).toUpperCase() + nodeType.slice(1),
+          ...(isScope && { dataX: [], dataY: [] }),
+        },
+      };
+
+      onAddNode(newNode);
+    },
+    [screenToFlowPosition, onAddNode]
+  );
+
+  return (
+    <div
+      className="w-full h-full"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
+        fitView
+      >
+        <Background />
+        <Panel position="top-left" className="bg-card p-2 rounded border border-border text-xs text-muted-foreground">
+          Drag nodes from left panel
+        </Panel>
+      </ReactFlow>
+    </div>
+  );
+}
+
+export default function GraphCanvas() {
   const nodes_store = useStudioStore((state) => state.nodes);
   const edges_store = useStudioStore((state) => state.edges);
   const setStoreNodes = useStudioStore((state) => state.setNodes);
@@ -88,74 +169,30 @@ function GraphCanvasContent() {
     [selectNode]
   );
 
-  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
-
-  const handleDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-
-      const nodeType = event.dataTransfer.getData("nodeType");
-      if (!nodeType) return;
-
-      // Use React Flow's screenToFlowPosition to get the correct position
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-
-      const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      const isScope = nodeType === "scope";
-      const nodeTypeVal = isScope ? "scope" : "custom";
-
-      const newNode: Node = {
-        id: nodeId,
-        type: nodeTypeVal,
-        position,
-        data: {
-          label: nodeType.charAt(0).toUpperCase() + nodeType.slice(1),
-          ...(isScope && { dataX: [], dataY: [] }),
-        },
-      };
-
+  const handleAddNode = useCallback(
+    (newNode: Node) => {
       setNodes((nds) => [...nds, newNode]);
       addNode({
-        id: nodeId,
-        type: nodeTypeVal,
-        position,
+        id: newNode.id,
+        type: newNode.type || "custom",
+        position: newNode.position,
         data: newNode.data,
       } as any);
     },
-    [setNodes, addNode, screenToFlowPosition]
+    [setNodes, addNode]
   );
 
-  return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={handleNodesChange}
-      onEdgesChange={handleEdgesChange}
-      onConnect={onConnect}
-      onNodeClick={handleNodeClick}
-      nodeTypes={nodeTypes}
-      fitView
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <Background />
-      <Panel position="top-left" className="bg-card p-2 rounded border border-border text-xs text-muted-foreground">
-        Drag nodes from left panel
-      </Panel>
-    </ReactFlow>
-  );
-}
-
-export default function GraphCanvas() {
   return (
     <div className="w-full h-full bg-background">
-      <GraphCanvasContent />
+      <InnerCanvas
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={handleNodeClick}
+        onAddNode={handleAddNode}
+      />
     </div>
   );
 }
