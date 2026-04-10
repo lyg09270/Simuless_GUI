@@ -157,7 +157,7 @@ export default function NodePanel() {
       </div>
 
       {/* Panel Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-sidebar">
         {mode === "graph" ? (
           // Graph Mode: Hierarchical Node Library (Simulink style)
           <div className="p-3">

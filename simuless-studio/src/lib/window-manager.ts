@@ -129,3 +129,35 @@ export const closeExternalWindow = (windowId: string) => {
 export const updateWindowData = (windowId: string, data: any) => {
   useWindowStore.getState().updateWindowData(windowId, data);
 };
+
+/**
+ * Send message to all windows of a specific type
+ */
+export const sendMessageToWindows = (
+  windowType: WindowType,
+  message: any
+) => {
+  const windows = useWindowStore.getState().getAllWindows();
+  windows.forEach((window) => {
+    if (window.type === windowType) {
+      // Try to find the window and send message
+      const childWindow = globalThis.open("", `window-${window.id}`) as any;
+      if (childWindow && !childWindow.closed) {
+        childWindow.postMessage(message, "*");
+      }
+    }
+  });
+};
+
+/**
+ * Store window references for communication
+ */
+const windowReferences = new Map<string, Window>();
+
+export const registerWindow = (windowId: string, windowRef: Window) => {
+  windowReferences.set(windowId, windowRef);
+};
+
+export const getWindowReference = (windowId: string): Window | undefined => {
+  return windowReferences.get(windowId);
+};

@@ -10,6 +10,7 @@ import ReactFlow, {
   Edge,
   NodeTypes,
   Panel,
+  useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useStudioStore } from "@/store/studio-store";
@@ -22,6 +23,8 @@ const nodeTypes: NodeTypes = {
 };
 
 function GraphCanvasContent() {
+  const { screenToFlowPosition } = useReactFlow();
+
   const nodes_store = useStudioStore((state) => state.nodes);
   const edges_store = useStudioStore((state) => state.edges);
   const setStoreNodes = useStudioStore((state) => state.setNodes);
@@ -97,23 +100,11 @@ function GraphCanvasContent() {
       const nodeType = event.dataTransfer.getData("nodeType");
       if (!nodeType) return;
 
-      const reactFlowWrapper = (event.currentTarget as HTMLDivElement)?.querySelector(
-        ".react-flow__viewport"
-      );
-      if (!reactFlowWrapper) return;
-
-      const reactFlowBounds = reactFlowWrapper.getBoundingClientRect();
-      
-      // Calculate position relative to the canvas viewport
-      const x = event.clientX - reactFlowBounds.left;
-      const y = event.clientY - reactFlowBounds.top;
-
-      // The position needs to be transformed based on zoom/pan
-      // For now, use a simple calculation
-      const position = {
-        x: x - 50,
-        y: y - 25,
-      };
+      // Use React Flow's screenToFlowPosition to get the correct position
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
       const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const isScope = nodeType === "scope";
@@ -137,7 +128,7 @@ function GraphCanvasContent() {
         data: newNode.data,
       } as any);
     },
-    [setNodes, addNode]
+    [setNodes, addNode, screenToFlowPosition]
   );
 
   return (

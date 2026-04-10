@@ -30,8 +30,8 @@ window.addEventListener("message", (event) => {
         <React.StrictMode>
           <ScopeWindow
             title={config.title}
-            dataX={data?.dataX}
-            dataY={data?.dataY}
+            initialDataX={data?.dataX}
+            initialDataY={data?.dataY}
           />
         </React.StrictMode>
       );

@@ -8,7 +8,9 @@ import {
   Globe,
   Menu,
 } from "lucide-react";
+import { useState } from "react";
 import { useStudioStore } from "@/store/studio-store";
+import { sendMessageToWindows } from "@/lib/window-manager";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -18,16 +20,45 @@ export default function TopBar() {
   const language = useStudioStore((state) => state.language);
   const setLanguage = useStudioStore((state) => state.setLanguage);
   const mode = useStudioStore((state) => state.mode);
+  const [isRunning, setIsRunning] = useState(false);
 
   const handleSave = () => {
     console.log("[CLI] Saving...");
   };
 
   const handleRun = () => {
+    if (isRunning) return;
+    setIsRunning(true);
     console.log("[CLI] Running simulation...");
+
+    // Generate sin wave data
+    const duration = 10; // 10 seconds
+    const sampleRate = 100; // 100 Hz
+    const totalSamples = duration * sampleRate;
+    const dataX: number[] = [];
+    const dataY: number[] = [];
+
+    for (let i = 0; i < totalSamples; i++) {
+      const t = i / sampleRate;
+      dataX.push(t);
+      dataY.push(Math.sin(2 * Math.PI * t)); // 1 Hz sin wave
+    }
+
+    // Send data to all scope windows
+    sendMessageToWindows("scope", {
+      type: "SIMULATION_DATA",
+      data: { dataX, dataY },
+    });
+
+    // Simulate for animation
+    setTimeout(() => {
+      setIsRunning(false);
+      console.log("[CLI] Simulation completed");
+    }, 2000);
   };
 
   const handleStop = () => {
+    setIsRunning(false);
     console.log("[CLI] Stopping simulation...");
   };
 

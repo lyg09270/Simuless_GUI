@@ -2,18 +2,24 @@ import { useState, useEffect } from "react";
 
 interface ScopeWindowProps {
   title: string;
-  dataX?: number[];
-  dataY?: number[];
+  initialDataX?: number[];
+  initialDataY?: number[];
 }
 
 let Plot: any = null;
 
 export default function ScopeWindow({
   title,
-  dataX,
-  dataY,
+  initialDataX,
+  initialDataY,
 }: ScopeWindowProps) {
   const [plotAvailable, setPlotAvailable] = useState(false);
+  const [dataX, setDataX] = useState<number[]>(
+    initialDataX || Array.from({ length: 100 }, (_, i) => i * 0.1)
+  );
+  const [dataY, setDataY] = useState<number[]>(
+    initialDataY || Array.from({ length: 100 }, (_, i) => Math.sin(i * 0.1))
+  );
 
   useEffect(() => {
     if (!Plot) {
@@ -28,9 +34,23 @@ export default function ScopeWindow({
     }
   }, []);
 
-  // Mock data for visualization if not provided
-  const x = dataX || Array.from({ length: 100 }, (_, i) => i * 0.1);
-  const y = dataY || Array.from({ length: 100 }, (_, i) => Math.sin(i * 0.1));
+  // Listen for simulation data from parent window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "SIMULATION_DATA") {
+        const { dataX: newDataX, dataY: newDataY } = event.data.data;
+        if (newDataX && newDataY) {
+          setDataX(newDataX);
+          setDataY(newDataY);
+        }
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   const isDark = document.documentElement.classList.contains("dark");
 
