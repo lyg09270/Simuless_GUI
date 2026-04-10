@@ -60,7 +60,7 @@ export default function PropertyPanel() {
                     type="text"
                     value={selectedNode.id}
                     readOnly
-                    className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent/50 text-sidebar-accent-foreground border border-sidebar-border"
+                    className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border cursor-default"
                   />
                 </div>
 
@@ -73,7 +73,7 @@ export default function PropertyPanel() {
                     type="text"
                     value={selectedNode.type || "custom"}
                     readOnly
-                    className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent/50 text-sidebar-accent-foreground border border-sidebar-border"
+                    className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border cursor-default"
                   />
                 </div>
 
@@ -90,7 +90,7 @@ export default function PropertyPanel() {
                         data: { ...selectedNode.data, label: e.target.value },
                       });
                     }}
-                    className="w-full px-2 py-1 rounded text-xs bg-background text-foreground border border-sidebar-border focus:border-primary focus:outline-none"
+                    className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border focus:border-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -117,7 +117,7 @@ export default function PropertyPanel() {
                           },
                         });
                       }}
-                      className="w-full px-2 py-1 rounded text-xs bg-background text-foreground border border-sidebar-border focus:border-primary focus:outline-none"
+                      className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border focus:border-primary focus:outline-none"
                     />
                   </div>
 
@@ -136,7 +136,7 @@ export default function PropertyPanel() {
                           },
                         });
                       }}
-                      className="w-full px-2 py-1 rounded text-xs bg-background text-foreground border border-sidebar-border focus:border-primary focus:outline-none"
+                      className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border focus:border-primary focus:outline-none"
                     />
                   </div>
                 </div>
@@ -166,7 +166,7 @@ export default function PropertyPanel() {
                               },
                             });
                           }}
-                          className="w-full px-2 py-1 rounded text-xs bg-background text-foreground border border-sidebar-border focus:border-primary focus:outline-none"
+                          className="w-full px-2 py-1 rounded text-xs bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border focus:border-primary focus:outline-none"
                         />
                       </div>
                     ))}

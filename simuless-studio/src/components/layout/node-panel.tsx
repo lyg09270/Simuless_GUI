@@ -185,22 +185,28 @@ export default function NodePanel() {
 
                   {isExpanded && category.children && (
                     <div className="space-y-1 pl-4">
-                      {category.children.map((node) => (
-                        <div
-                          key={node.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, node.id)}
-                          className="p-2 rounded bg-sidebar-accent/50 text-sidebar-accent-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-xs font-medium"
-                          title={node.description}
-                        >
-                          <div className="truncate">{node.label}</div>
-                          {node.description && (
-                            <div className="text-xs opacity-75 truncate">
-                              {node.description}
+                      {category.children.map((node) => {
+                        const NodeIcon = node.icon;
+                        return (
+                          <div
+                            key={node.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, node.id)}
+                            className="p-2 rounded bg-sidebar-accent/50 text-sidebar-accent-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-xs font-medium flex items-start gap-2 group"
+                            title={node.description}
+                          >
+                            <NodeIcon size={16} className="flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="truncate">{node.label}</div>
+                              {node.description && (
+                                <div className="text-xs opacity-75 truncate">
+                                  {node.description}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

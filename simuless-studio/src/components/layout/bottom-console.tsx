@@ -87,7 +87,7 @@ export default function BottomConsole() {
       {/* Messages */}
       {!isCollapsed && (
         <>
-          <div className="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-1 bg-card">
+          <div className="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-1 bg-card text-card-foreground">
             {messages.length === 0 ? (
               <div className="text-muted-foreground">
                 {t("console.ready", language)}

@@ -9,11 +9,15 @@ export default function TabBar() {
   const closeTab = useStudioStore((state) => state.closeTab);
 
   if (tabs.length === 0) {
-    return null;
+    return (
+      <div className="h-10 border-b border-border bg-sidebar flex items-center px-2">
+        <div className="text-xs text-sidebar-foreground/50">No files open</div>
+      </div>
+    );
   }
 
   return (
-    <div className="h-10 border-b border-border bg-sidebar flex items-center gap-1 px-2 overflow-x-auto">
+    <div className="h-10 border-b border-border bg-sidebar flex items-center gap-1 px-2 overflow-x-auto text-sidebar-foreground">
       {tabs.map((tab) => (
         <button
           key={tab.id}

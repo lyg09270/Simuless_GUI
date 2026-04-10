@@ -7,6 +7,21 @@ import {
   BarChart3,
   GitBranch,
   CircleDot,
+  RadioTower,
+  Gauge,
+  Waves,
+  Sigma,
+  LineChart,
+  Divide,
+  Layers,
+  Activity,
+  Filter,
+  Lock,
+  Database,
+  Save,
+  GitMerge,
+  Sliders,
+  Settings2,
 } from "lucide-react";
 
 export interface NodeCategory {
@@ -21,7 +36,7 @@ export interface NodeItem {
   id: string;
   label: string;
   description?: string;
-  icon?: React.ComponentType<any>;
+  icon: React.ComponentType<any>;
 }
 
 export const nodeCategories: NodeCategory[] = [
@@ -31,10 +46,10 @@ export const nodeCategories: NodeCategory[] = [
     label: "sources.title",
     icon: CircleDot,
     children: [
-      { id: "input", label: "Input", description: "Input signal" },
-      { id: "constant", label: "Constant", description: "Constant value" },
-      { id: "ramp", label: "Ramp", description: "Ramp signal" },
-      { id: "sine", label: "Sine Wave", description: "Sine wave generator" },
+      { id: "input", label: "Input", description: "Input signal", icon: RadioTower },
+      { id: "constant", label: "Constant", description: "Constant value", icon: Gauge },
+      { id: "ramp", label: "Ramp", description: "Ramp signal", icon: TrendingUp },
+      { id: "sine", label: "Sine Wave", description: "Sine wave generator", icon: Waves },
     ],
   },
   {
@@ -43,14 +58,15 @@ export const nodeCategories: NodeCategory[] = [
     label: "math.title",
     icon: Plus,
     children: [
-      { id: "sum", label: "Sum", description: "Add or subtract signals" },
-      { id: "gain", label: "Gain", description: "Multiply by constant" },
+      { id: "sum", label: "Sum", description: "Add or subtract signals", icon: Sigma },
+      { id: "gain", label: "Gain", description: "Multiply by constant", icon: Volume2 },
       {
         id: "product",
         label: "Product",
         description: "Multiply signals",
+        icon: Zap,
       },
-      { id: "divide", label: "Divide", description: "Divide signals" },
+      { id: "divide", label: "Divide", description: "Divide signals", icon: Divide },
     ],
   },
   {
@@ -63,18 +79,21 @@ export const nodeCategories: NodeCategory[] = [
         id: "integrator",
         label: "Integrator",
         description: "Integrate signal",
+        icon: LineChart,
       },
       {
         id: "differentiator",
         label: "Differentiator",
         description: "Differentiate signal",
+        icon: TrendingDown,
       },
       {
         id: "transfer-fn",
         label: "Transfer Function",
         description: "Linear transfer function",
+        icon: Activity,
       },
-      { id: "state-space", label: "State-Space", description: "State-space model" },
+      { id: "state-space", label: "State-Space", description: "State-space model", icon: Layers },
     ],
   },
   {
@@ -83,9 +102,9 @@ export const nodeCategories: NodeCategory[] = [
     label: "routing.title",
     icon: GitBranch,
     children: [
-      { id: "mux", label: "Mux", description: "Multiplex signals" },
-      { id: "demux", label: "Demux", description: "Demultiplex signals" },
-      { id: "selector", label: "Selector", description: "Select signal elements" },
+      { id: "mux", label: "Mux", description: "Multiplex signals", icon: GitMerge },
+      { id: "demux", label: "Demux", description: "Demultiplex signals", icon: Layers },
+      { id: "selector", label: "Selector", description: "Select signal elements", icon: Sliders },
     ],
   },
   {
@@ -94,10 +113,10 @@ export const nodeCategories: NodeCategory[] = [
     label: "sinks.title",
     icon: BarChart3,
     children: [
-      { id: "scope", label: "Scope", description: "Oscilloscope display" },
-      { id: "output", label: "Output", description: "Output signal" },
-      { id: "display", label: "Display", description: "Display numeric value" },
-      { id: "to-file", label: "To File", description: "Write to file" },
+      { id: "scope", label: "Scope", description: "Oscilloscope display", icon: BarChart3 },
+      { id: "output", label: "Output", description: "Output signal", icon: RadioTower },
+      { id: "display", label: "Display", description: "Display numeric value", icon: Volume2 },
+      { id: "to-file", label: "To File", description: "Write to file", icon: Save },
     ],
   },
   {
@@ -106,9 +125,9 @@ export const nodeCategories: NodeCategory[] = [
     label: "control.title",
     icon: Zap,
     children: [
-      { id: "pid", label: "PID Controller", description: "PID control loop" },
-      { id: "filter", label: "Low-Pass Filter", description: "Filter signal" },
-      { id: "limiter", label: "Saturation", description: "Limit signal range" },
+      { id: "pid", label: "PID Controller", description: "PID control loop", icon: Settings2 },
+      { id: "filter", label: "Low-Pass Filter", description: "Filter signal", icon: Filter },
+      { id: "limiter", label: "Saturation", description: "Limit signal range", icon: Lock },
     ],
   },
 ];

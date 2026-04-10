@@ -11,6 +11,7 @@ import ReactFlow, {
   Node,
   Edge,
   NodeTypes,
+  Panel,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useStudioStore } from "@/store/studio-store";
@@ -35,15 +36,13 @@ function GraphCanvasContent() {
       id: n.id,
       position: n.position,
       data: n.data,
-      type: "custom",
+      type: n.type === "scope" ? "scope" : "custom",
     })) as Node[]
   );
 
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     edges_store as Edge[]
   );
-
-  const reactFlowRef = useRef<HTMLDivElement>(null);
 
   // Sync local state to store
   const syncToStore = useCallback(() => {
@@ -59,11 +58,6 @@ function GraphCanvasContent() {
 
   const onConnect: OnConnect = useCallback(
     (connection: Connection) => {
-      const newEdge = {
-        id: `e${connection.source}-${connection.target}`,
-        source: connection.source || "",
-        target: connection.target || "",
-      };
       setEdges((eds) => addEdge(connection, eds));
       syncToStore();
     },
@@ -86,32 +80,48 @@ function GraphCanvasContent() {
     [onEdgesChange, syncToStore]
   );
 
-  const handleDragOver = useCallback((event: React.DragEvent) => {
+  const handleNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      selectNode(node.id);
+    },
+    [selectNode]
+  );
+
+  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
 
   const handleDrop = useCallback(
-    (event: React.DragEvent) => {
+    (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
-
-      if (!reactFlowRef.current) return;
 
       const nodeType = event.dataTransfer.getData("nodeType");
       if (!nodeType) return;
 
-      const bounds = reactFlowRef.current.getBoundingClientRect();
+      const reactFlowWrapper = (event.currentTarget as HTMLDivElement)?.querySelector(
+        ".react-flow__viewport"
+      );
+      if (!reactFlowWrapper) return;
+
+      const reactFlowBounds = reactFlowWrapper.getBoundingClientRect();
       
-      // Simple position calculation without useReactFlow
-      const x = event.clientX - bounds.left - 50;
-      const y = event.clientY - bounds.top - 25;
-      const position = { x, y };
+      // Calculate position relative to the canvas viewport
+      const x = event.clientX - reactFlowBounds.left;
+      const y = event.clientY - reactFlowBounds.top;
+
+      // The position needs to be transformed based on zoom/pan
+      // For now, use a simple calculation
+      const position = {
+        x: x - 50,
+        y: y - 25,
+      };
 
       const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const isScope = nodeType === "scope";
       const nodeTypeVal = isScope ? "scope" : "custom";
 
-      const newNode = {
+      const newNode: Node = {
         id: nodeId,
         type: nodeTypeVal,
         position,
@@ -128,17 +138,8 @@ function GraphCanvasContent() {
         position,
         data: newNode.data,
       } as any);
-
-      syncToStore();
     },
-    [setNodes, addNode, syncToStore]
-  );
-
-  const handleNodeClick = useCallback(
-    (event: React.MouseEvent, node: Node) => {
-      selectNode(node.id);
-    },
-    [selectNode]
+    [setNodes, addNode]
   );
 
   return (
@@ -151,28 +152,24 @@ function GraphCanvasContent() {
       onNodeClick={handleNodeClick}
       nodeTypes={nodeTypes}
       fitView
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       <Background />
       <Controls />
       <MiniMap />
+      <Panel position="top-left" className="bg-card p-2 rounded border border-border">
+        <div className="text-xs text-muted-foreground">
+          Drag nodes from the left panel to create
+        </div>
+      </Panel>
     </ReactFlow>
   );
 }
 
 export default function GraphCanvas() {
-  const reactFlowRef = useRef<HTMLDivElement>(null);
-
-  const handleDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
-
   return (
-    <div
-      ref={reactFlowRef}
-      className="w-full h-full bg-background"
-      onDragOver={handleDragOver}
-    >
+    <div className="w-full h-full bg-background">
       <GraphCanvasContent />
     </div>
   );

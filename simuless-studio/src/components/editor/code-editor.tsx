@@ -23,7 +23,7 @@ export default function CodeEditor() {
       <TabBar />
 
       {activeTab ? (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden bg-card">
           <textarea
             value={activeTab.content}
             onChange={(e) => updateTabContent(activeTabId!, e.target.value)}
@@ -33,7 +33,7 @@ export default function CodeEditor() {
           />
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+        <div className="flex-1 flex items-center justify-center text-muted-foreground bg-card">
           No files open
         </div>
       )}

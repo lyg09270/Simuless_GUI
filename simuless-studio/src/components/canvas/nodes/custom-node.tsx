@@ -21,10 +21,11 @@ export default function CustomNode({
   return (
     <div
       className={cn(
-        "px-4 py-2 rounded border-2 bg-card text-card-foreground shadow-md transition-all",
+        "px-4 py-3 rounded-lg border-2 shadow-lg transition-all",
+        "bg-card text-card-foreground",
         isSelected
-          ? "border-primary bg-primary/10"
-          : "border-border hover:border-primary/50"
+          ? "border-primary shadow-lg shadow-primary/30"
+          : "border-border hover:border-primary/60 hover:shadow-md"
       )}
     >
       <Handle
@@ -32,18 +33,18 @@ export default function CustomNode({
         position={Position.Left}
         isConnectable={!isConnecting}
         className={cn(
-          "h-2 w-2 rounded-full",
-          isSelected ? "bg-primary" : "bg-muted"
+          "h-2.5 w-2.5 rounded-full transition-colors",
+          isSelected ? "bg-primary" : "bg-muted-foreground/60"
         )}
       />
-      <div className="text-sm font-medium whitespace-nowrap">{data.label}</div>
+      <div className="text-sm font-semibold whitespace-nowrap">{data.label}</div>
       <Handle
         type="source"
         position={Position.Right}
         isConnectable={!isConnecting}
         className={cn(
-          "h-2 w-2 rounded-full",
-          isSelected ? "bg-primary" : "bg-muted"
+          "h-2.5 w-2.5 rounded-full transition-colors",
+          isSelected ? "bg-primary" : "bg-muted-foreground/60"
         )}
       />
     </div>

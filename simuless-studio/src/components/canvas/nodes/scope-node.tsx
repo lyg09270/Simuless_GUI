@@ -51,14 +51,16 @@ export default function ScopeNode({ data, id, isConnecting }: ScopeNodeProps) {
     },
   ];
 
+  const isDark = document.documentElement.classList.contains("dark");
+
   const plotLayout = {
     title: data.label,
     xaxis: { title: "Time (s)" },
     yaxis: { title: "Amplitude" },
     margin: { l: 40, r: 20, t: 40, b: 40 },
     paper_bgcolor: "transparent",
-    plot_bgcolor: "#1e293b",
-    font: { color: "#e2e8f0" },
+    plot_bgcolor: isDark ? "#1e293b" : "#f5f5f5",
+    font: { color: isDark ? "#e2e8f0" : "#1f2937" },
     height: 300,
     showlegend: true,
   };
@@ -99,10 +101,10 @@ export default function ScopeNode({ data, id, isConnecting }: ScopeNodeProps) {
             />
           </div>
         ) : (
-          <div className="w-48 h-24 bg-card border border-border rounded flex items-center justify-center">
+          <div className="w-48 h-24 bg-sidebar border border-sidebar-border rounded flex items-center justify-center">
             <button
               onClick={() => setShowPlot(!showPlot)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="text-xs text-sidebar-foreground/75 hover:text-sidebar-foreground transition-colors"
             >
               {showPlot ? "Hide" : "Show"} Signal
             </button>
