@@ -7,6 +7,8 @@ import type {
   Theme,
   StudioNode,
   StudioEdge,
+  EditorTab,
+  FileItem,
 } from "@/types/graph";
 
 interface StudioStore extends StudioState {
@@ -29,6 +31,17 @@ interface StudioStore extends StudioState {
   selectNode: (nodeId: string | null) => void;
   toggleSidebar: () => void;
   togglePropertyPanel: () => void;
+
+  // Tab management actions
+  openTab: (tab: EditorTab) => void;
+  closeTab: (tabId: string) => void;
+  setActiveTab: (tabId: string) => void;
+  updateTabContent: (tabId: string, content: string) => void;
+  closeAllTabs: () => void;
+
+  // File browser actions
+  setWorkingDirectory: (path: string) => void;
+  setFileTree: (files: FileItem[]) => void;
 }
 
 export const useStudioStore = create<StudioStore>()(
@@ -44,6 +57,10 @@ export const useStudioStore = create<StudioStore>()(
         selectedNodeId: null,
         sidebarOpen: true,
         propertyPanelOpen: false,
+        tabs: [],
+        activeTabId: null,
+        workingDirectory: "/workspace",
+        fileTree: [],
 
         // Mode & Display actions
         setMode: (mode) => set({ mode }),
@@ -95,6 +112,43 @@ export const useStudioStore = create<StudioStore>()(
           set((state) => ({
             propertyPanelOpen: !state.propertyPanelOpen,
           })),
+
+        // Tab management actions
+        openTab: (tab) =>
+          set((state) => {
+            const existingTab = state.tabs.find((t) => t.id === tab.id);
+            if (existingTab) {
+              return { activeTabId: tab.id };
+            }
+            return {
+              tabs: [...state.tabs, tab],
+              activeTabId: tab.id,
+            };
+          }),
+        closeTab: (tabId) =>
+          set((state) => {
+            const newTabs = state.tabs.filter((t) => t.id !== tabId);
+            let newActiveTab = state.activeTabId;
+            if (state.activeTabId === tabId) {
+              newActiveTab = newTabs.length > 0 ? newTabs[0].id : null;
+            }
+            return {
+              tabs: newTabs,
+              activeTabId: newActiveTab,
+            };
+          }),
+        setActiveTab: (tabId) => set({ activeTabId: tabId }),
+        updateTabContent: (tabId, content) =>
+          set((state) => ({
+            tabs: state.tabs.map((t) =>
+              t.id === tabId ? { ...t, content, isDirty: true } : t
+            ),
+          })),
+        closeAllTabs: () => set({ tabs: [], activeTabId: null }),
+
+        // File browser actions
+        setWorkingDirectory: (path) => set({ workingDirectory: path }),
+        setFileTree: (files) => set({ fileTree: files }),
       }),
       {
         name: "studio-store",

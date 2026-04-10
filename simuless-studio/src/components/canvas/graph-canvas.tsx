@@ -15,9 +15,12 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useStudioStore } from "@/store/studio-store";
 import CustomNode from "./nodes/custom-node";
+import ScopeNode from "./nodes/scope-node";
+import CodeEditor from "@/components/editor/code-editor";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
+  scope: ScopeNode,
 };
 
 function GraphCanvasContent() {

@@ -3,23 +3,17 @@ import {
   Code2,
   Settings,
   ChevronDown,
-  Plus,
   Trash2,
+  FileText,
+  Folder,
+  FolderOpen,
 } from "lucide-react";
 import { useStudioStore } from "@/store/studio-store";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-
-const nodeTypes = [
-  { id: "gain", label: "node.gain" },
-  { id: "integrator", label: "node.integrator" },
-  { id: "differentiator", label: "node.differentiator" },
-  { id: "sum", label: "node.sum" },
-  { id: "scope", label: "node.scope" },
-  { id: "input", label: "node.input" },
-  { id: "output", label: "node.output" },
-];
+import { nodeCategories } from "@/lib/node-categories";
+import type { FileItem } from "@/types/graph";
 
 export default function NodePanel() {
   const mode = useStudioStore((state) => state.mode);
@@ -27,13 +21,91 @@ export default function NodePanel() {
   const language = useStudioStore((state) => state.language);
   const nodes = useStudioStore((state) => state.nodes);
   const deleteNode = useStudioStore((state) => state.deleteNode);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(
-    "available"
+  const workingDirectory = useStudioStore((state) => state.workingDirectory);
+  const fileTree = useStudioStore((state) => state.fileTree);
+  const openTab = useStudioStore((state) => state.openTab);
+
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(nodeCategories.map((c) => c.id))
   );
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set(["/workspace"])
+  );
+
+  const toggleCategory = (categoryId: string) => {
+    const newSet = new Set(expandedCategories);
+    if (newSet.has(categoryId)) {
+      newSet.delete(categoryId);
+    } else {
+      newSet.add(categoryId);
+    }
+    setExpandedCategories(newSet);
+  };
+
+  const toggleFolder = (path: string) => {
+    const newSet = new Set(expandedFolders);
+    if (newSet.has(path)) {
+      newSet.delete(path);
+    } else {
+      newSet.add(path);
+    }
+    setExpandedFolders(newSet);
+  };
 
   const handleDragStart = (e: React.DragEvent, nodeType: string) => {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("nodeType", nodeType);
+  };
+
+  const handleFileClick = (file: FileItem) => {
+    if (file.type === "file") {
+      const tabId = `tab-${file.path}`;
+      openTab({
+        id: tabId,
+        filePath: file.path,
+        fileName: file.name,
+        content: "// File content here",
+        isDirty: false,
+        language: "python",
+      });
+    }
+  };
+
+  const renderFileTree = (files: FileItem[], depth: number = 0) => {
+    return (
+      <div style={{ marginLeft: `${depth * 12}px` }} className="space-y-1">
+        {files.map((file) => (
+          <div key={file.path}>
+            {file.type === "directory" ? (
+              <>
+                <button
+                  onClick={() => toggleFolder(file.path)}
+                  className="flex items-center gap-1 w-full px-2 py-1 rounded hover:bg-sidebar-accent text-sidebar-foreground text-sm transition-colors"
+                >
+                  {expandedFolders.has(file.path) ? (
+                    <FolderOpen size={14} />
+                  ) : (
+                    <Folder size={14} />
+                  )}
+                  <span className="truncate">{file.name}</span>
+                </button>
+                {expandedFolders.has(file.path) && file.children && (
+                  renderFileTree(file.children, depth + 1)
+                )}
+              </>
+            ) : (
+              <button
+                onClick={() => handleFileClick(file)}
+                className="flex items-center gap-2 w-full px-2 py-1 rounded hover:bg-sidebar-accent text-sidebar-foreground text-sm transition-colors"
+              >
+                <FileText size={14} />
+                <span className="truncate">{file.name}</span>
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -78,69 +150,75 @@ export default function NodePanel() {
       {/* Panel Content */}
       <div className="flex-1 overflow-y-auto">
         {mode === "graph" ? (
-          // Graph Mode: Node Library
-          <div className="p-4">
-            {/* Available Nodes */}
-            <div className="mb-4">
-              <button
-                onClick={() =>
-                  setExpandedCategory(
-                    expandedCategory === "available" ? null : "available"
-                  )
-                }
-                className="flex items-center gap-2 w-full text-sidebar-foreground hover:text-sidebar-primary mb-2 transition-colors"
-              >
-                <ChevronDown
-                  size={16}
-                  className={cn(
-                    "transition-transform",
-                    expandedCategory !== "available" && "-rotate-90"
-                  )}
-                />
-                <span className="font-semibold text-sm">
-                  {t("sidebar.nodeLibrary", language)}
-                </span>
-              </button>
+          // Graph Mode: Hierarchical Node Library (Simulink style)
+          <div className="p-3">
+            {nodeCategories.map((category) => {
+              const Icon = category.icon;
+              const isExpanded = expandedCategories.has(category.id);
+              return (
+                <div key={category.id} className="mb-3">
+                  <button
+                    onClick={() => toggleCategory(category.id)}
+                    className="flex items-center gap-2 w-full px-2 py-1.5 rounded hover:bg-sidebar-accent/50 text-sidebar-foreground transition-colors mb-1"
+                  >
+                    <ChevronDown
+                      size={14}
+                      className={cn(
+                        "transition-transform flex-shrink-0",
+                        !isExpanded && "-rotate-90"
+                      )}
+                    />
+                    <Icon size={14} className="flex-shrink-0" />
+                    <span className="font-semibold text-xs uppercase opacity-75">
+                      {category.name}
+                    </span>
+                  </button>
 
-              {expandedCategory === "available" && (
-                <div className="space-y-2 ml-2">
-                  {nodeTypes.map((nodeType) => (
-                    <div
-                      key={nodeType.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, nodeType.id)}
-                      className="p-2 rounded bg-sidebar-accent text-sidebar-accent-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-sm"
-                    >
-                      {t(nodeType.label as any, language)}
+                  {isExpanded && category.children && (
+                    <div className="space-y-1 pl-4">
+                      {category.children.map((node) => (
+                        <div
+                          key={node.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, node.id)}
+                          className="p-2 rounded bg-sidebar-accent/50 text-sidebar-accent-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-xs font-medium"
+                          title={node.description}
+                        >
+                          <div className="truncate">{node.label}</div>
+                          {node.description && (
+                            <div className="text-xs opacity-75 truncate">
+                              {node.description}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })}
 
-            {/* Current Nodes */}
+            {/* Current Canvas Nodes */}
             {nodes.length > 0 && (
-              <div className="border-t border-border pt-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-sm text-sidebar-foreground">
-                    Canvas Nodes ({nodes.length})
-                  </span>
+              <div className="border-t border-sidebar-border pt-3 mt-3">
+                <div className="text-xs font-semibold text-sidebar-foreground uppercase opacity-75 mb-2">
+                  Canvas ({nodes.length})
                 </div>
                 <div className="space-y-1">
                   {nodes.map((node) => (
                     <div
                       key={node.id}
-                      className="flex items-center justify-between p-2 rounded bg-sidebar-accent/50 hover:bg-sidebar-accent group"
+                      className="flex items-center justify-between p-2 rounded bg-sidebar-accent/50 hover:bg-sidebar-accent group text-xs"
                     >
-                      <span className="text-xs text-sidebar-accent-foreground truncate">
-                        {node.data.label} ({node.id})
+                      <span className="text-sidebar-accent-foreground truncate">
+                        {node.data.label}
                       </span>
                       <button
                         onClick={() => deleteNode(node.id)}
                         className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive p-0.5"
                         title="Delete"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   ))}
@@ -149,21 +227,18 @@ export default function NodePanel() {
             )}
           </div>
         ) : (
-          // Code Mode: File Tree or Editor Info
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-4">
-              <button className="p-1.5 rounded hover:bg-sidebar-accent text-sidebar-foreground transition-colors">
-                <Plus size={16} />
-              </button>
-              <span className="text-sm font-semibold text-sidebar-foreground">
-                Files
-              </span>
+          // Code Mode: File Browser
+          <div className="p-3">
+            <div className="text-xs font-semibold text-sidebar-foreground uppercase opacity-75 mb-2">
+              {workingDirectory}
             </div>
-            <div className="space-y-2">
-              <div className="p-2 rounded bg-sidebar-accent/50 text-sidebar-accent-foreground text-xs">
-                code-mode-coming-soon.ts
+            {fileTree.length > 0 ? (
+              renderFileTree(fileTree)
+            ) : (
+              <div className="text-xs text-sidebar-foreground/50 p-2">
+                No files found
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

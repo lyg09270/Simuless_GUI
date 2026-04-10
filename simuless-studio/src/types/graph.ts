@@ -22,6 +22,22 @@ export type StudioMode = "graph" | "code";
 export type Language = "en" | "zh";
 export type Theme = "light" | "dark";
 
+export interface FileItem {
+  name: string;
+  path: string;
+  type: "file" | "directory";
+  children?: FileItem[];
+}
+
+export interface EditorTab {
+  id: string;
+  filePath: string;
+  fileName: string;
+  content: string;
+  isDirty: boolean;
+  language?: "python" | "typescript" | "javascript" | "json";
+}
+
 export interface StudioState {
   // Mode & Display
   mode: StudioMode;
@@ -36,4 +52,10 @@ export interface StudioState {
   // UI State
   sidebarOpen: boolean;
   propertyPanelOpen: boolean;
+
+  // Code Editor
+  tabs: EditorTab[];
+  activeTabId: string | null;
+  workingDirectory: string;
+  fileTree: FileItem[];
 }
