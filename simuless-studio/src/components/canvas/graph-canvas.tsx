@@ -16,7 +16,6 @@ import "reactflow/dist/style.css";
 import { useStudioStore } from "@/store/studio-store";
 import CustomNode from "./nodes/custom-node";
 import ScopeNode from "./nodes/scope-node";
-import CodeEditor from "@/components/editor/code-editor";
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -109,19 +108,25 @@ function GraphCanvasContent() {
       const position = { x, y };
 
       const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const isScope = nodeType === "scope";
+      const nodeTypeVal = isScope ? "scope" : "custom";
+
       const newNode = {
         id: nodeId,
-        type: "custom",
+        type: nodeTypeVal,
         position,
-        data: { label: nodeType },
+        data: {
+          label: nodeType.charAt(0).toUpperCase() + nodeType.slice(1),
+          ...(isScope && { dataX: [], dataY: [] }),
+        },
       };
 
       setNodes((nds) => [...nds, newNode]);
       addNode({
         id: nodeId,
-        type: "custom",
+        type: nodeTypeVal,
         position,
-        data: { label: nodeType },
+        data: newNode.data,
       } as any);
 
       syncToStore();

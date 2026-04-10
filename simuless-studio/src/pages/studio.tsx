@@ -2,7 +2,7 @@ import TopBar from "@/components/layout/top-bar";
 import NodePanel from "@/components/layout/node-panel";
 import PropertyPanel from "@/components/layout/property-panel";
 import BottomConsole from "@/components/layout/bottom-console";
-import GraphCanvas from "@/components/canvas/graph-canvas";
+import UnifiedCanvas from "@/components/canvas/unified-canvas";
 
 export default function StudioPage() {
   return (
@@ -13,7 +13,7 @@ export default function StudioPage() {
         <NodePanel />
 
         <div className="flex-1">
-          <GraphCanvas />
+          <UnifiedCanvas />
         </div>
 
         <PropertyPanel />

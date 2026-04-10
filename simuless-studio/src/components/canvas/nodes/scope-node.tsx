@@ -1,17 +1,10 @@
 import { Handle, Position } from "reactflow";
 import { useStudioStore } from "@/store/studio-store";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 
-// Dynamically import Plotly to avoid SSR issues
+// Dynamically import Plotly
 let Plot: any = null;
-
-try {
-  Plot = require("react-plotly.js").default;
-} catch (e) {
-  // Plotly not available yet
-}
 
 interface ScopeNodeProps {
   data: {
@@ -28,6 +21,20 @@ export default function ScopeNode({ data, id, isConnecting }: ScopeNodeProps) {
   const selectedNodeId = useStudioStore((state) => state.selectedNodeId);
   const isSelected = selectedNodeId === id;
   const [showPlot, setShowPlot] = useState(false);
+  const [plotAvailable, setPlotAvailable] = useState(false);
+
+  useEffect(() => {
+    if (!Plot) {
+      try {
+        Plot = require("react-plotly.js").default;
+        setPlotAvailable(true);
+      } catch (e) {
+        console.warn("Plotly not available");
+      }
+    } else {
+      setPlotAvailable(true);
+    }
+  }, []);
 
   // Mock data for visualization if not provided
   const dataX = data.dataX || Array.from({ length: 100 }, (_, i) => i * 0.1);
@@ -79,7 +86,7 @@ export default function ScopeNode({ data, id, isConnecting }: ScopeNodeProps) {
         <div className="text-sm font-semibold mb-2">{data.label}</div>
 
         {/* Scope visualization */}
-        {showPlot && Plot ? (
+        {showPlot && plotAvailable ? (
           <div className="mb-2">
             <Plot
               data={plotData}

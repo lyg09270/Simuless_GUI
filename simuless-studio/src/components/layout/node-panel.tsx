@@ -60,13 +60,22 @@ export default function NodePanel() {
   const handleFileClick = (file: FileItem) => {
     if (file.type === "file") {
       const tabId = `tab-${file.path}`;
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      let language: "python" | "typescript" | "javascript" | "json" = "python";
+
+      if (extension === "ts") language = "typescript";
+      else if (extension === "js") language = "javascript";
+      else if (extension === "json") language = "json";
+      else if (extension === "yaml" || extension === "yml") language = "python";
+      else if (extension === "md") language = "python";
+
       openTab({
         id: tabId,
         filePath: file.path,
         fileName: file.name,
-        content: "// File content here",
+        content: "", // Will be loaded by code-editor component
         isDirty: false,
-        language: "python",
+        language,
       });
     }
   };
