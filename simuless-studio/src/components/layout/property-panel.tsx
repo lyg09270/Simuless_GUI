@@ -1,4 +1,4 @@
-import { Trash2, ChevronUp } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { useStudioStore } from "@/store/studio-store";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -9,36 +9,38 @@ export default function PropertyPanel() {
   const nodes = useStudioStore((state) => state.nodes);
   const updateNode = useStudioStore((state) => state.updateNode);
   const deleteNode = useStudioStore((state) => state.deleteNode);
+  const selectNode = useStudioStore((state) => state.selectNode);
   const language = useStudioStore((state) => state.language);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
+  const shouldShow = selectedNode && !isCollapsed;
 
   return (
     <div
       className={cn(
-        "border-l border-border bg-sidebar flex flex-col transition-all",
-        selectedNode ? "w-80" : "w-0 overflow-hidden"
+        "border-l border-border bg-sidebar flex flex-col transition-all overflow-hidden",
+        shouldShow ? "w-80" : "w-0"
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between h-12 border-b border-border px-4 flex-shrink-0">
-        <span className="text-sm font-semibold text-sidebar-foreground">
-          {t("property.title", language)}
-        </span>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground"
-        >
-          <ChevronUp
-            size={16}
-            className={cn(
-              "transition-transform",
-              isCollapsed && "rotate-180"
-            )}
-          />
-        </button>
-      </div>
+      {shouldShow && (
+        <div className="flex items-center justify-between h-12 border-b border-border px-4 flex-shrink-0">
+          <span className="text-sm font-semibold text-sidebar-foreground">
+            {t("property.title", language)}
+          </span>
+          <button
+            onClick={() => {
+              setIsCollapsed(true);
+              selectNode(null);
+            }}
+            className="p-1 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground"
+            title="Close"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
       {/* Content */}
       {!isCollapsed && (

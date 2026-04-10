@@ -1,8 +1,6 @@
 import { useCallback, useRef } from "react";
 import ReactFlow, {
-  Controls,
   Background,
-  MiniMap,
   addEdge,
   Connection,
   useNodesState,
@@ -156,12 +154,8 @@ function GraphCanvasContent() {
       onDrop={handleDrop}
     >
       <Background />
-      <Controls />
-      <MiniMap />
-      <Panel position="top-left" className="bg-card p-2 rounded border border-border">
-        <div className="text-xs text-muted-foreground">
-          Drag nodes from the left panel to create
-        </div>
+      <Panel position="top-left" className="bg-card p-2 rounded border border-border text-xs text-muted-foreground">
+        Drag nodes from left panel
       </Panel>
     </ReactFlow>
   );
