@@ -192,7 +192,7 @@ export default function NodePanel() {
                             key={node.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, node.id)}
-                            className="p-2 rounded bg-sidebar-accent/50 text-sidebar-accent-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-xs font-medium flex items-start gap-2 group"
+                            className="p-2 rounded bg-card text-card-foreground cursor-move hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors text-xs font-medium flex items-start gap-2 group border border-border"
                             title={node.description}
                           >
                             <NodeIcon size={16} className="flex-shrink-0 mt-0.5" />
@@ -223,9 +223,9 @@ export default function NodePanel() {
                   {nodes.map((node) => (
                     <div
                       key={node.id}
-                      className="flex items-center justify-between p-2 rounded bg-sidebar-accent/50 hover:bg-sidebar-accent group text-xs"
+                      className="flex items-center justify-between p-2 rounded bg-card text-card-foreground hover:bg-sidebar-accent group text-xs border border-border"
                     >
-                      <span className="text-sidebar-accent-foreground truncate">
+                      <span className="text-card-foreground truncate">
                         {node.data.label}
                       </span>
                       <button
