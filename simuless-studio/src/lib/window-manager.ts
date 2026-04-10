@@ -93,24 +93,23 @@ export const openExternalWindow = (config: WindowConfig): Window | null => {
   const newWindow = window.open(windowUrl, `window-${config.id}`, windowFeatures);
 
   if (newWindow) {
-    // Pass data via postMessage
+    // Store window reference for later communication
+    useWindowStore.getState().openWindow(config);
+
+    // Pass data via postMessage with delay to ensure window is ready
     const sendData = () => {
-      newWindow.postMessage(
-        { type: "WINDOW_INIT", config, data },
-        window.location.origin
-      );
+      try {
+        newWindow.postMessage(
+          { type: "WINDOW_INIT", config, data },
+          "*"
+        );
+      } catch (error) {
+        console.error("Failed to send data to window:", error);
+      }
     };
 
-    // Wait for window to be fully loaded
-    if (newWindow.document.readyState === "loading") {
-      newWindow.addEventListener("load", sendData, { once: true });
-    } else {
-      // Window already loaded
-      setTimeout(sendData, 100);
-    }
-
-    // Store window reference
-    useWindowStore.getState().openWindow(config);
+    // Send data after a small delay to ensure window is ready
+    setTimeout(sendData, 500);
   }
 
   return newWindow;
@@ -138,12 +137,16 @@ export const sendMessageToWindows = (
   message: any
 ) => {
   const windows = useWindowStore.getState().getAllWindows();
-  windows.forEach((window) => {
-    if (window.type === windowType) {
-      // Try to find the window and send message
-      const childWindow = globalThis.open("", `window-${window.id}`) as any;
-      if (childWindow && !childWindow.closed) {
-        childWindow.postMessage(message, "*");
+  windows.forEach((windowConfig) => {
+    if (windowConfig.type === windowType) {
+      try {
+        // Try to find the window and send message
+        const childWindow = globalThis.open("", `window-${windowConfig.id}`) as any;
+        if (childWindow && !childWindow.closed) {
+          childWindow.postMessage(message, "*");
+        }
+      } catch (error) {
+        console.error(`Failed to send message to window ${windowConfig.id}:`, error);
       }
     }
   });

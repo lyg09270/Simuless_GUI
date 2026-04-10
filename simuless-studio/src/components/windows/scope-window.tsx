@@ -56,8 +56,8 @@ export default function ScopeWindow({
 
   const plotData = [
     {
-      x,
-      y,
+      x: dataX,
+      y: dataY,
       type: "scatter",
       mode: "lines",
       name: "Signal",
@@ -112,7 +112,7 @@ export default function ScopeWindow({
       {/* Footer */}
       <div className="border-t border-border px-6 py-3 bg-sidebar text-sidebar-foreground flex items-center justify-between flex-shrink-0">
         <span className="text-xs text-sidebar-foreground/75">
-          Data: {y.length} points | X: [{x[0]?.toFixed(2)}, {x[x.length - 1]?.toFixed(2)}] | Y: [{Math.min(...y).toFixed(2)}, {Math.max(...y).toFixed(2)}]
+          Data: {dataY.length} points | X: [{dataX[0]?.toFixed(2)}, {dataX[dataX.length - 1]?.toFixed(2)}] | Y: [{Math.min(...dataY).toFixed(2)}, {Math.max(...dataY).toFixed(2)}]
         </span>
       </div>
     </div>
