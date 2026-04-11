@@ -120,34 +120,11 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
+    }
   body {
     @apply bg-background text-foreground;
-  }
+    }
   html {
     @apply font-sans;
-  }
-
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    @apply w-2 h-2;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-sidebar dark:bg-sidebar;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-sidebar-border dark:bg-sidebar-border rounded hover:bg-sidebar-accent dark:hover:bg-sidebar-accent;
-  }
-
-  /* Firefox scrollbar */
-  * {
-    scrollbar-color: oklch(0.922 0 0) oklch(0.985 0 0);
-    scrollbar-width: thin;
-  }
-
-  .dark {
-    scrollbar-color: oklch(1 0 0 / 10%) oklch(0.205 0 0);
-  }
+    }
 }
