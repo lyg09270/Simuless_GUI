@@ -1,7 +1,7 @@
-import StudioLayout from "@/features/layout/StudioLayout";
+import StudioLayout from "@/features/layout/StudioLayout"
 
 function App() {
-  return <StudioLayout />;
+  return <StudioLayout />
 }
 
-export default App;
+export default App
